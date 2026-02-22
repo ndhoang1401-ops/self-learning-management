@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Self-Learning Management</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+}
+
+/* Glass container */
+.container{
+    width:95%;
+    max-width:1100px;
+    padding:50px;
+    border-radius:30px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(30px);
+    border:1px solid rgba(255,255,255,0.15);
+    box-shadow:0 30px 70px rgba(0,0,0,0.5);
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+/* TikTok style gradient title */
+.title{
+    font-size:32px;
+    font-weight:800;
+    text-transform:uppercase;
+    background:linear-gradient(90deg,#25f4ee,#fe2c55);
+    background-clip:text;
+    -webkit-background-clip:text;
+    color:transparent;
+    -webkit-text-fill-color:transparent;
+    letter-spacing:2px;
+}
+
+/* Icons */
+.icons{
+    display:flex;
+    gap:15px;
+}
+
+.icons img{
+    width:36px;
+    transition:0.3s;
+}
+
+.icons img:hover{
+    transform:scale(1.1);
+}
+
+/* Form */
+form{
+    display:grid;
+    grid-template-columns:2fr 1.5fr 1fr 1fr 1fr;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+input{
+    padding:14px;
+    border:none;
+    border-radius:25px;
+    outline:none;
+    font-size:14px;
+}
+
+.add-btn{
+    grid-column:span 5;
+    padding:14px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(90deg,#25f4ee,#fe2c55);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.add-btn:hover{
+    transform:scale(1.03);
+}
+
+/* Task */
+ul{list-style:none;}
+
+li{
+    background:rgba(255,255,255,0.07);
+    padding:20px;
+    border-radius:25px;
+    margin-bottom:15px;
+}
+
+.completed{
+    opacity:0.5;
+    text-decoration:line-through;
+}
+
+.task-title{
+    font-weight:600;
+    margin-bottom:5px;
+}
+
+.task-meta{
+    font-size:13px;
+    opacity:0.8;
+    margin-bottom:10px;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+}
+
+.actions button{
+    border:none;
+    padding:8px 15px;
+    border-radius:20px;
+    color:white;
+    cursor:pointer;
+}
+
+.done-btn{background:#25f4ee;color:black;}
+.delete-btn{background:#fe2c55;}
+
+/* Bottom */
+.bottom{
+    margin-top:25px;
+}
+
+.stats-btn{
+    padding:12px 25px;
+    background:linear-gradient(90deg,#fe2c55,#25f4ee);
+    border-radius:25px;
+    text-decoration:none;
+    color:white;
+}
+
+/* Footer */
+footer{
+    margin-top:40px;
+    text-align:center;
+    font-size:14px;
+    opacity:0.7;
+    line-height:1.6;
+}
+
+/* Responsive */
+@media(max-width:768px){
+    .header{
+        flex-direction:column;
+        gap:20px;
+        text-align:center;
+    }
+
+    form{
+        grid-template-columns:1fr;
+    }
+
+    .add-btn{
+        grid-column:span 1;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="title">Self-Learning Management</div>
+
+        <div class="icons">
+            <a href="https://chat.openai.com" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg">
+            </a>
+            <a href="https://www.google.com" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg">
+            </a>
+        </div>
+    </div>
+
+    <form onsubmit="addTask(event)">
+        <input type="text" id="title" placeholder="Task Title" required>
+        <input type="text" id="subject" placeholder="Subject" required>
+        <input type="date" id="date" required>
+        <input type="time" id="start_time" required>
+        <input type="time" id="end_time" required>
+        <button class="add-btn" type="submit">Add Task</button>
+    </form>
+
+    <ul id="taskList"></ul>
+
+    <div class="bottom">
+        <a href="/stats" class="stats-btn">View Statistics</a>
+    </div>
+
+    <footer>
+        © 2026 Nguyễn Doãn Hoàng.<br>
+        All rights reserved.<br>
+        Created by Nguyễn Doãn Hoàng
+    </footer>
+
+</div>
+
+<script>
+async function loadTasks(){
+    const res = await fetch("/api/tasks");
+    const tasks = await res.json();
+    const list = document.getElementById("taskList");
+    list.innerHTML="";
+
+    tasks.forEach(t=>{
+        const li=document.createElement("li");
+        if(t.completed) li.classList.add("completed");
+
+        li.innerHTML=`
+            <div class="task-title">${t.title}</div>
+            <div class="task-meta">
+                Subject: ${t.subject} |
+                ${formatDate(t.date)} |
+                ${t.start_time} - ${t.end_time}
+            </div>
+            <div class="actions">
+                <button class="done-btn" onclick="toggleTask(${t.id})">Done</button>
+                <button class="delete-btn" onclick="deleteTask(${t.id})">Delete</button>
+            </div>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function formatDate(dateStr){
+    const d=new Date(dateStr);
+    const day=String(d.getDate()).padStart(2,'0');
+    const month=String(d.getMonth()+1).padStart(2,'0');
+    const year=String(d.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+}
+
+async function addTask(e){
+    e.preventDefault();
+    await fetch("/add",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            title:title.value,
+            subject:subject.value,
+            date:date.value,
+            start_time:start_time.value,
+            end_time:end_time.value
+        })
+    });
+    e.target.reset();
+    loadTasks();
+}
+
+async function toggleTask(id){
+    await fetch("/toggle/"+id,{method:"POST"});
+    loadTasks();
+}
+
+async function deleteTask(id){
+    await fetch("/delete/"+id,{method:"POST"});
+    loadTasks();
+}
+
+loadTasks();
+</script>
+
+</body>
+</html>

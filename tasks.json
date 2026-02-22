@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "title": "Đề thi cuối kì 2",
+        "subject": "Toán",
+        "date": "2026-01-03",
+        "start_time": "22:30",
+        "end_time": "23:30",
+        "completed": true
+    },
+    {
+        "id": 2,
+        "title": "Đề thi giữ kì 2",
+        "subject": "Hoá",
+        "date": "2026-02-03",
+        "start_time": "23:30",
+        "end_time": "00:00",
+        "completed": false
+    }
+]

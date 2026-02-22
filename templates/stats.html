@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Statistics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    overflow:auto;
+}
+
+.container{
+    width:800px;
+    padding:40px;
+    border-radius:25px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(20px);
+}
+
+.bottom{
+    margin-top:20px;
+    text-align:center;
+}
+
+a{
+    padding:10px 20px;
+    background:#ff416c;
+    border-radius:20px;
+    color:white;
+    text-decoration:none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Task Completion Statistics</h1>
+<canvas id="chart"></canvas>
+
+<div class="bottom">
+<a href="/">← Back to Home</a>
+</div>
+</div>
+
+<script>
+async function loadStats(){
+    const res=await fetch("/api/tasks");
+    const tasks=await res.json();
+
+    let done=0;
+    let pending=0;
+
+    tasks.forEach(t=>{
+        if(t.completed) done++;
+        else pending++;
+    });
+
+    new Chart(document.getElementById("chart"),{
+        type:"doughnut",
+        data:{
+            labels:["Completed","Pending"],
+            datasets:[{
+                data:[done,pending],
+                backgroundColor:["#00ffae","#ff416c"]
+            }]
+        }
+    });
+}
+
+loadStats();
+</script>
+
+</body>
+</html>
